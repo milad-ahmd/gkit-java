@@ -83,7 +83,7 @@ public final class Feature {
                 h ^= Byte.toUnsignedLong(b);
                 h *= 0x100000001b3L;
             }
-            return (int)(Long.toUnsignedLong(h) % buckets);
+            return (int) Long.remainderUnsigned(h, buckets);
         }
     }
 }

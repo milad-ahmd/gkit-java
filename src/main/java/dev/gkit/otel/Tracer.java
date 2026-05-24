@@ -8,11 +8,11 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
-import io.opentelemetry.api.common.Attributes;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -32,6 +32,9 @@ import java.util.concurrent.Callable;
  * }</pre>
  */
 public final class Tracer {
+
+    private static final AttributeKey<String> SERVICE_NAME =
+        AttributeKey.stringKey("service.name");
 
     private Tracer() {}
 
@@ -63,10 +66,10 @@ public final class Tracer {
     /** Installs a global OpenTelemetry TracerProvider from the given config. */
     public static OpenTelemetrySdk install(Config cfg) {
         Resource resource = Resource.getDefault().toBuilder()
-            .put(ResourceAttributes.SERVICE_NAME, cfg.serviceName)
+            .put(SERVICE_NAME, cfg.serviceName)
             .build();
 
-        SdkTracerProvider.Builder tracerBuilder = SdkTracerProvider.builder()
+        SdkTracerProviderBuilder tracerBuilder = SdkTracerProvider.builder()
             .setResource(resource);
 
         if (cfg.otlpEndpoint != null) {

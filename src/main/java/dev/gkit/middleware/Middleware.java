@@ -124,6 +124,6 @@ public final class Middleware {
         @Override public void sendError(int sc) throws IOException { this.status = sc; super.sendError(sc); }
         @Override public void sendError(int sc, String msg) throws IOException { this.status = sc; super.sendError(sc, msg); }
 
-        int getStatus() { return status; }
+        @Override public int getStatus() { return status; }
     }
 }

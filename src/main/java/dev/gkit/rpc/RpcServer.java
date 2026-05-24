@@ -1,10 +1,11 @@
 package dev.gkit.rpc;
 
 import io.grpc.*;
-import io.grpc.reflection.v1alpha.ServerReflectionGrpc;
 import io.grpc.protobuf.services.ProtoReflectionService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,30 +42,37 @@ public final class RpcServer {
 
     public static final class Builder {
         private int port = 50051;
-        private final ServerBuilder<?> sb;
+        private final List<BindableService> services = new ArrayList<>();
+        private final List<ServerInterceptor> interceptors = new ArrayList<>();
         private boolean reflection = true;
-
-        Builder() { this.sb = ServerBuilder.forPort(port); }
 
         public Builder port(int p) {
             this.port = p;
             return this;
         }
 
-        public Builder addService(BindableService svc) { sb.addService(svc); return this; }
+        public Builder addService(BindableService svc) { services.add(svc); return this; }
 
         public Builder addInterceptor(ServerInterceptor interceptor) {
-            sb.intercept(interceptor); return this;
+            interceptors.add(interceptor);
+            return this;
         }
 
         public Builder enableReflection() { this.reflection = true; return this; }
         public Builder disableReflection() { this.reflection = false; return this; }
 
         public RpcServer build() {
-            if (reflection) sb.addService(ProtoReflectionService.newInstance());
-            return new RpcServer(ServerBuilder.forPort(port)
-                .addService(ProtoReflectionService.newInstance())
-                .build());
+            ServerBuilder<?> sb = ServerBuilder.forPort(port);
+            for (BindableService svc : services) {
+                sb.addService(svc);
+            }
+            for (ServerInterceptor interceptor : interceptors) {
+                sb.intercept(interceptor);
+            }
+            if (reflection) {
+                sb.addService(ProtoReflectionService.newInstance());
+            }
+            return new RpcServer(sb.build());
         }
     }
 }
