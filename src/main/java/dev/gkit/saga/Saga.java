@@ -125,7 +125,7 @@ public final class Saga {
             super("Saga '" + sagaName + "' failed at step '" + failedStep + "': " + cause.getMessage(), cause);
             this.sagaName = sagaName;
             this.failedStep = failedStep;
-            this.compensationErrors = compensationErrors == null ? Collections.emptyList() : compErrors;
+            this.compensationErrors = compErrors == null ? Collections.emptyList() : compErrors;
         }
 
         public String getSagaName() { return sagaName; }
