@@ -31,7 +31,7 @@ public interface Backoff {
      * @param d the constant wait duration
      * @return a constant {@link Backoff}
      */
-    static Backoff constant(Duration d) { return _ -> d; }
+    static Backoff constant(Duration d) { return attempt -> d; }
 
     /**
      * Creates an exponential backoff with a configurable multiplier and cap.

@@ -98,9 +98,6 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -108,7 +105,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <argLine>--enable-preview</argLine>
                     <!-- Exclude integration tests from unit test phase -->
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
@@ -167,7 +163,6 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>3.2.5</version>
                         <configuration>
-                            <argLine>--enable-preview</argLine>
                             <includes>
                                 <include>**/*IntegrationTest.java</include>
                             </includes>
