@@ -21,7 +21,7 @@ class PipelineTest {
     @Test
     @DisplayName("process with empty list returns empty list")
     void processWithEmptyListReturnsEmpty() throws Exception {
-        List<String> results = Pipeline.process(List.of(), s -> s.toUpperCase(), 2);
+        List<String> results = Pipeline.process(List.<String>of(), (String s) -> s.toUpperCase(), 2);
         assertTrue(results.isEmpty());
     }
 

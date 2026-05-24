@@ -8,6 +8,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +41,11 @@ class OutboxIntegrationTest {
 
     @BeforeAll
     static void setup() {
-        store = new Store(Store.Config.builder()
-                .url(postgres.getJdbcUrl())
-                .username(postgres.getUsername())
+        store = Store.open(Store.Config.builder()
+                .host(postgres.getHost())
+                .port(postgres.getMappedPort(5432))
+                .database(postgres.getDatabaseName())
+                .user(postgres.getUsername())
                 .password(postgres.getPassword())
                 .build());
         store.update(SCHEMA);
@@ -50,7 +53,7 @@ class OutboxIntegrationTest {
 
     @AfterAll
     static void teardown() {
-        if (store != null) store.close();
+        store = null;
     }
 
     @Test
@@ -58,17 +61,16 @@ class OutboxIntegrationTest {
         List<String> received = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(2);
 
-        // Store two events in a transaction.
         store.withTx(jdbc -> {
             Outbox.store(jdbc, "orders.placed", Map.of("id", "1"));
             Outbox.store(jdbc, "orders.placed", Map.of("id", "2"));
             return null;
         });
 
-        Outbox.Relay relay = new Outbox.Relay(store, (topic, payload) -> {
+        Outbox.Relay relay = new Outbox.Relay(store.jdbc(), (topic, payload) -> {
             received.add(topic);
             latch.countDown();
-        }, Outbox.RelayOptions.builder().intervalMs(100).batchSize(10).build());
+        }, Duration.ofMillis(100), 10);
 
         relay.start();
         boolean done = latch.await(10, TimeUnit.SECONDS);
@@ -83,20 +85,18 @@ class OutboxIntegrationTest {
     void rollbackPreventsPublish() throws InterruptedException {
         List<String> received = new ArrayList<>();
 
-        // Store inside a rolled-back transaction.
         assertThrows(RuntimeException.class, () -> store.withTx(jdbc -> {
             Outbox.store(jdbc, "should.not.publish", Map.of("id", "x"));
             throw new RuntimeException("rollback");
         }));
 
-        Outbox.Relay relay = new Outbox.Relay(store, (topic, payload) -> received.add(topic),
-                Outbox.RelayOptions.builder().intervalMs(50).build());
+        Outbox.Relay relay = new Outbox.Relay(store.jdbc(), (topic, payload) -> received.add(topic),
+                Duration.ofMillis(50), 100);
 
         relay.start();
         Thread.sleep(300);
         relay.stop();
 
-        // Filter for only the specific topic we expect not to be published
         long count = received.stream().filter("should.not.publish"::equals).count();
         assertEquals(0, count, "Rolled-back events must not be published");
     }

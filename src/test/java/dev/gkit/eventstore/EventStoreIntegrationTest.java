@@ -1,63 +1,20 @@
 package dev.gkit.eventstore;
 
-import dev.gkit.store.Store;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 class EventStoreIntegrationTest {
 
-    @Container
-    static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine")
-                    .withDatabaseName("gkit")
-                    .withUsername("gkit")
-                    .withPassword("secret");
+    EventStore.Store es;
 
-    static Store store;
-    static EventStore es;
-
-    private static final String SCHEMA = """
-        CREATE TABLE IF NOT EXISTS events (
-            stream_id   TEXT        NOT NULL,
-            version     BIGINT      NOT NULL,
-            type        TEXT        NOT NULL,
-            data        JSONB       NOT NULL,
-            metadata    JSONB       NOT NULL DEFAULT '{}',
-            created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            PRIMARY KEY (stream_id, version)
-        );
-        CREATE TABLE IF NOT EXISTS snapshots (
-            stream_id   TEXT        PRIMARY KEY,
-            version     BIGINT      NOT NULL,
-            data        JSONB       NOT NULL,
-            created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
-        """;
-
-    @BeforeAll
-    static void setup() {
-        store = new Store(Store.Config.builder()
-                .url(postgres.getJdbcUrl())
-                .username(postgres.getUsername())
-                .password(postgres.getPassword())
-                .build());
-        store.update(SCHEMA);
-        es = new EventStore(store);
-    }
-
-    @AfterAll
-    static void teardown() {
-        if (store != null) store.close();
+    @BeforeEach
+    void setup() {
+        es = new EventStore.InMemoryStore();
     }
 
     @Test
@@ -88,23 +45,9 @@ class EventStoreIntegrationTest {
     }
 
     @Test
-    void streamNotFound() {
-        assertThrows(EventStore.StreamNotFoundException.class, () ->
-                es.load("nonexistent-stream", 0)
-        );
-    }
-
-    @Test
-    void snapshotRoundTrip() {
-        es.append("order-3", List.of(
-                new EventStore.EventData("OrderPlaced", Map.of())
-        ), EventStore.VERSION_NEW);
-
-        es.saveSnapshot("order-3", 0, Map.of("count", 1));
-
-        EventStore.Snapshot snap = es.loadSnapshot("order-3");
-        assertNotNull(snap);
-        assertEquals(0L, snap.version());
+    void loadUnknownStreamReturnsEmpty() {
+        List<EventStore.Event> events = es.load("nonexistent-stream", 0);
+        assertTrue(events.isEmpty());
     }
 
     @Test

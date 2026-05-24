@@ -26,21 +26,23 @@ class StoreIntegrationTest {
 
     @BeforeAll
     static void setup() {
-        store = new Store(Store.Config.builder()
-                .url(postgres.getJdbcUrl())
-                .username(postgres.getUsername())
+        store = Store.open(Store.Config.builder()
+                .host(postgres.getHost())
+                .port(postgres.getMappedPort(5432))
+                .database(postgres.getDatabaseName())
+                .user(postgres.getUsername())
                 .password(postgres.getPassword())
                 .build());
     }
 
     @AfterAll
     static void teardown() {
-        if (store != null) store.close();
+        store = null;
     }
 
     @Test
     void pingSucceeds() {
-        assertDoesNotThrow(() -> store.ping());
+        assertDoesNotThrow(() -> store.query("SELECT 1"));
     }
 
     @Test

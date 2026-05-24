@@ -8,6 +8,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,19 +46,21 @@ class QueueIntegrationTest {
 
     @BeforeAll
     static void setup() {
-        store = new Store(Store.Config.builder()
-                .url(postgres.getJdbcUrl())
-                .username(postgres.getUsername())
+        store = Store.open(Store.Config.builder()
+                .host(postgres.getHost())
+                .port(postgres.getMappedPort(5432))
+                .database(postgres.getDatabaseName())
+                .user(postgres.getUsername())
                 .password(postgres.getPassword())
                 .build());
         store.update(SCHEMA);
-        queue = new Queue(store, Queue.Options.builder().pollIntervalMs(100).build());
+        queue = new Queue(store.jdbc(), Duration.ofMillis(100));
     }
 
     @AfterAll
     static void teardown() {
-        queue.stop();
-        if (store != null) store.close();
+        if (queue != null) queue.stop();
+        store = null;
     }
 
     @Test
