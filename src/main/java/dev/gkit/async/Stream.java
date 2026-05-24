@@ -39,7 +39,7 @@ public final class Stream<T> {
     public List<T> collect() throws InterruptedException {
         List<T> out = new ArrayList<>();
         Object item;
-        while ((item = queue.take()) \!= END) out.add((T) item);
+        while ((item = queue.take()) != END) out.add((T) item);
         return out;
     }
 
@@ -47,7 +47,7 @@ public final class Stream<T> {
     @SuppressWarnings("unchecked")
     public void forEach(Consumer<T> fn) throws InterruptedException {
         Object item;
-        while ((item = queue.take()) \!= END) fn.accept((T) item);
+        while ((item = queue.take()) != END) fn.accept((T) item);
     }
 
     /** Returns a new Stream that applies fn to each element. */
@@ -76,7 +76,7 @@ public final class Stream<T> {
         return generate(send -> {
             ScheduledExecutorService sched = Executors.newSingleThreadScheduledExecutor();
             List<T> buf = Collections.synchronizedList(new ArrayList<>());
-            Runnable flush = () -> { synchronized (buf) { if (\!buf.isEmpty()) { send.accept(new ArrayList<>(buf)); buf.clear(); } } };
+            Runnable flush = () -> { synchronized (buf) { if (!buf.isEmpty()) { send.accept(new ArrayList<>(buf)); buf.clear(); } } };
             ScheduledFuture<?> timer = sched.scheduleAtFixedRate(flush, timeout.toMillis(), timeout.toMillis(), TimeUnit.MILLISECONDS);
             try {
                 forEach(item -> { buf.add(item); if (buf.size() >= size) flush.run(); });
@@ -93,7 +93,7 @@ public final class Stream<T> {
         CompletableFuture.runAsync(() -> {
             try {
                 Object item;
-                while ((item = queue.take()) \!= END) { for (var q : qs) q.put(item); }
+                while ((item = queue.take()) != END) { for (var q : qs) q.put(item); }
                 for (var q : qs) q.put(END);
             } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         });

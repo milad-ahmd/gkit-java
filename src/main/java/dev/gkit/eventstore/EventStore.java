@@ -50,12 +50,12 @@ public final class EventStore {
             long current = stream.isEmpty() ? -1L : stream.get(stream.size()-1).version();
             if (expectedVersion == VERSION_NEW && current >= 0)
                 throw new VersionConflictException("Stream already exists: " + streamId);
-            if (expectedVersion >= 0 && current \!= expectedVersion)
+            if (expectedVersion >= 0 && current != expectedVersion)
                 throw new VersionConflictException("Expected " + expectedVersion + " but was " + current);
             long next = current + 1;
             for (EventData ed : events) {
                 stream.add(new Event(streamId, next++, ed.type(), ed.data(),
-                        ed.metadata() \!= null ? ed.metadata() : Map.of(), Instant.now()));
+                        ed.metadata() != null ? ed.metadata() : Map.of(), Instant.now()));
             }
         }
 

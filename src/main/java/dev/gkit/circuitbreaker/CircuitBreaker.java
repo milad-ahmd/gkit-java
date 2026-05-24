@@ -87,7 +87,7 @@ public final class CircuitBreaker {
     }
 
     private void maybeTransitionFromOpen() {
-        if (state == State.OPEN && openedAt \!= null && Duration.between(openedAt, Instant.now()).compareTo(openTimeout) >= 0) {
+        if (state == State.OPEN && openedAt != null && Duration.between(openedAt, Instant.now()).compareTo(openTimeout) >= 0) {
             transition(State.HALF_OPEN);
         }
     }
@@ -95,7 +95,7 @@ public final class CircuitBreaker {
     private void transition(State to) {
         if (state == to) return;
         State from = state; state = to;
-        if (onStateChange \!= null) onStateChange.accept(from, to);
+        if (onStateChange != null) onStateChange.accept(from, to);
     }
 
     /** Builder for CircuitBreaker configuration. */

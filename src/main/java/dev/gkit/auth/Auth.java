@@ -20,7 +20,7 @@ public final class Auth {
 
     /** JWT payload: user ID and roles. */
     public record Claims(String userId, List<String> roles) {
-        public boolean hasRole(String role) { return roles \!= null && roles.contains(role); }
+        public boolean hasRole(String role) { return roles != null && roles.contains(role); }
         public boolean hasAnyRole(String... required) {
             for (String r : required) { if (hasRole(r)) return true; } return false;
         }
@@ -74,11 +74,11 @@ public final class Auth {
                 throws ServletException, IOException {
             String header = req.getHeader("Authorization");
             String token = null;
-            if (header \!= null && header.startsWith("Bearer ")) {
+            if (header != null && header.startsWith("Bearer ")) {
                 token = header.substring(7).strip();
             } else {
                 Cookie[] cookies = req.getCookies();
-                if (cookies \!= null) {
+                if (cookies != null) {
                     for (Cookie c : cookies) { if ("access_token".equals(c.getName())) { token = c.getValue(); break; } }
                 }
             }

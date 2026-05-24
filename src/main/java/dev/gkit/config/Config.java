@@ -40,7 +40,7 @@ public final class Config {
             String raw = System.getenv(env.value());
             if (raw == null || raw.isEmpty()) {
                 DefaultValue dv = f.getAnnotation(DefaultValue.class);
-                if (dv \!= null) raw = dv.value();
+                if (dv != null) raw = dv.value();
             }
             if (raw == null || raw.isEmpty()) {
                 if (f.isAnnotationPresent(Required.class))
@@ -51,7 +51,7 @@ public final class Config {
             try { setField(dst, f, raw); }
             catch (Exception e) { errors.add("Invalid value for " + env.value() + ": " + e.getMessage()); }
         }
-        if (\!errors.isEmpty()) throw new ConfigException(String.join("; ", errors));
+        if (!errors.isEmpty()) throw new ConfigException(String.join("; ", errors));
         return dst;
     }
 
