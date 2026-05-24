@@ -60,7 +60,10 @@ public final class Feature {
             Flag f = flags.get(name);
             if (f == null || !f.isEnabled()) return false;
             if (f.getAllowList().contains(entityId)) return true;
-            if (f.getPercentage() > 0) return hashBucket(name + ":" + entityId, 100) < f.getPercentage();
+            if (f.getPercentage() > 0) {
+                return hashBucket(name + ":" + entityId, 100) < f.getPercentage();
+            }
+            if (!f.getAllowList().isEmpty()) return false;
             return true;
         }
 
