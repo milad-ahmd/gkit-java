@@ -68,6 +68,7 @@ public final class Queue {
     }
 
     public void start(int workers) {
+        if (scheduler != null && !scheduler.isShutdown()) return;
         scheduler = Executors.newScheduledThreadPool(workers);
         for (int i = 0; i < workers; i++) {
             scheduler.scheduleAtFixedRate(this::processBatch, 0, pollInterval.toMillis(), TimeUnit.MILLISECONDS);
@@ -78,9 +79,10 @@ public final class Queue {
 
     private void processBatch() {
         List<Map<String, Object>> rows = jdbc.queryForList(
-            "SELECT id, type, payload, attempts, max_attempts FROM jobs " +
-            "WHERE status='pending' AND run_at <= NOW() ORDER BY run_at LIMIT 10 " +
-            "FOR UPDATE SKIP LOCKED");
+            "UPDATE jobs SET status='processing' WHERE id IN (" +
+            "SELECT id FROM jobs WHERE status='pending' AND run_at <= NOW() " +
+            "ORDER BY run_at LIMIT 10 FOR UPDATE SKIP LOCKED" +
+            ") RETURNING id, type, payload, attempts, max_attempts");
 
         for (Map<String, Object> row : rows) {
             String id = row.get("id").toString();
@@ -91,22 +93,23 @@ public final class Queue {
 
             JobHandler handler = handlers.get(type);
             if (handler == null) {
-                jdbc.update("UPDATE jobs SET status='failed', last_error=? WHERE id=?::uuid",
+                jdbc.update("UPDATE jobs SET status='failed', last_error=? WHERE id=?::uuid AND status='processing'",
                     "no handler for type: " + type, id);
                 continue;
             }
             try {
                 handler.handle(new Payload(payloadStr));
-                jdbc.update("UPDATE jobs SET status='done', attempts=? WHERE id=?::uuid", attempts + 1, id);
+                jdbc.update("UPDATE jobs SET status='done', attempts=? WHERE id=?::uuid AND status='processing'",
+                    attempts + 1, id);
             } catch (Exception e) {
                 int nextAttempts = attempts + 1;
                 if (nextAttempts >= maxAttempts) {
-                    jdbc.update("UPDATE jobs SET status='dead', attempts=?, last_error=? WHERE id=?::uuid",
+                    jdbc.update("UPDATE jobs SET status='dead', attempts=?, last_error=? WHERE id=?::uuid AND status='processing'",
                         nextAttempts, e.getMessage(), id);
                 } else {
                     long backoffSecs = (long) Math.pow(2, nextAttempts) * 10;
                     Instant runAt = Instant.now().plusSeconds(Math.min(backoffSecs, 3600));
-                    jdbc.update("UPDATE jobs SET status='pending', attempts=?, last_error=?, run_at=? WHERE id=?::uuid",
+                    jdbc.update("UPDATE jobs SET status='pending', attempts=?, last_error=?, run_at=? WHERE id=?::uuid AND status='processing'",
                         nextAttempts, e.getMessage(), java.sql.Timestamp.from(runAt), id);
                 }
             }

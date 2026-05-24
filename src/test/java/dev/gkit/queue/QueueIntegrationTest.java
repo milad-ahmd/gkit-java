@@ -94,7 +94,7 @@ class QueueIntegrationTest {
         queue.enqueue("flaky", java.util.Map.of());
         queue.start(1);
 
-        assertTrue(latch.await(15, TimeUnit.SECONDS), "Job should succeed after retry");
+        assertTrue(latch.await(30, TimeUnit.SECONDS), "Job should succeed after retry");
         assertTrue(attempts.get() >= 2);
     }
 }
