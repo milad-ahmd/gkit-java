@@ -15,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
-## [1.0.0] — 2024-03-19
+## [1.0.0] — 2026-03-19
 
 ### Added
 

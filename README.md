@@ -1,8 +1,9 @@
 # gkit-java
 
+[![CI](https://github.com/milad-ahmd/gkit-java/actions/workflows/ci.yml/badge.svg)](https://github.com/milad-ahmd/gkit-java/actions/workflows/ci.yml)
+[![JitPack](https://jitpack.io/v/milad-ahmd/gkit-java.svg)](https://jitpack.io/#milad-ahmd/gkit-java)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Maven Central](https://img.shields.io/badge/Maven%20Central-1.0.0-blue.svg)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **gkit-java** is a production-grade Java 21 toolkit for building reliable, observable microservices.
@@ -54,15 +55,24 @@ Each package is independently usable and designed for composability.
 
 ## Installation
 
-Add to your `pom.xml`:
+Available via [JitPack](https://jitpack.io/#milad-ahmd/gkit-java). Add to your `pom.xml`:
 
 ```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
 <dependency>
-    <groupId>dev.gkit</groupId>
+    <groupId>com.github.milad-ahmd</groupId>
     <artifactId>gkit-java</artifactId>
-    <version>1.0.0</version>
+    <version>v1.0.0</version>
 </dependency>
 ```
+
+Also published to [GitHub Packages](https://github.com/milad-ahmd/gkit-java/packages) on each release (requires authentication).
 
 ---
 
