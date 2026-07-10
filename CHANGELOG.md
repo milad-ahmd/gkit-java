@@ -53,5 +53,5 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 - `sched` — fixed-rate and one-shot job scheduler
 - `validation` — fluent field-level validator with built-in rules
 
-[Unreleased]: https://github.com/miladhzz/gkit-java/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/miladhzz/gkit-java/releases/tag/v1.0.0
+[Unreleased]: https://github.com/milad-ahmd/gkit-java/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/milad-ahmd/gkit-java/releases/tag/v1.0.0

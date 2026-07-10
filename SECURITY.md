@@ -13,7 +13,7 @@
 
 Report vulnerabilities privately via **GitHub's Security Advisory** feature:
 
-1. Go to the [Security tab](https://github.com/miladhzz/gkit-java/security/advisories)
+1. Go to the [Security tab](https://github.com/milad-ahmd/gkit-java/security/advisories)
 2. Click **"Report a vulnerability"**
 3. Describe the issue, affected class(es), Java version, and reproduction steps
 

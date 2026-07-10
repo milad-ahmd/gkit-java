@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **gkit-java** is a production-grade Java 21 toolkit for building reliable, observable microservices.
-It is a faithful port of [gkit](https://github.com/miladhzz/gkit) (Go) to idiomatic Java with Spring Boot integration.
+It is a faithful port of [gkit](https://github.com/milad-ahmd/gkit-go) (Go) to idiomatic Java with Spring Boot integration.
 
 Each package is independently usable and designed for composability.
 

@@ -31,7 +31,7 @@ Be kind and respectful. We follow the [Contributor Covenant v2.1](https://www.co
    ```
 2. Add the upstream remote:
    ```bash
-   git remote add upstream https://github.com/miladhzz/gkit-java.git
+   git remote add upstream https://github.com/milad-ahmd/gkit-java.git
    ```
 3. Create a feature branch:
    ```bash
@@ -103,7 +103,7 @@ Rules:
 3. Add or update tests for changed behaviour
 4. Update Javadoc if the public API changes
 5. Fill in the PR template
-6. Request review from `@miladhzz`
+6. Request review from `@milad-ahmd`
 
 New packages must include:
 - Class with full Javadoc
